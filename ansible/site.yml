@@ -1,0 +1,21 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Test SSH connection"
+      ping:
+      ignore_unreachable: true
+      ignore_errors: true
+      changed_when: false
+      register: ssh_test
+
+- hosts: all
+  gather_facts: false
+  roles:
+    - { role: bootstrap, when: "ssh_test.unreachable is defined" }
+
+- hosts: all
+  gather_facts: false
+  roles:
+    - common
+    - k3s/common
+

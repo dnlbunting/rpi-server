@@ -1,0 +1,57 @@
+- include_vars: vars/vault.yml
+
+- name: Ping
+  ping:
+
+- name: Create ansible user
+  become: yes
+  user:  >
+      name={{ ansible_username }}
+      password={{ ansible_password | password_hash('sha512') }}
+      shell=/bin/bash
+      groups=sudo
+      append=yes
+      generate_ssh_key=yes
+      ssh_key_bits=2048
+      state=present
+
+- name: Create personal user
+  become: yes
+  user:  >
+      name={{ personal_username }}
+      password={{ personal_password }}
+      shell=/bin/bash
+      groups=sudo
+      append=yes
+      generate_ssh_key=yes
+      ssh_key_bits=2048
+      state=present
+
+- name: Add my local public key to the ansible user
+  become: yes
+  authorized_key:
+    user: "{{ ansible_username }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    state: present
+
+
+- name: Add my local public key to the {{personal_username}} user
+  become: yes
+  authorized_key:
+    user: "{{ personal_username }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    state: present
+
+- name: user | switch current user to {{ansible_username}}
+  set_fact:
+     current_user: "{{ ansible_user }}"
+     ansible_user: "{{ ansible_username }}"
+
+- name: user | remove current user ({{ current_user }}) if it's not "{{ ansible_username }}"
+  become: yes
+  user:
+    name: "{{ current_user }}"
+    state: absent
+    remove: yes
+    force: yes
+  when: "current_user != ansible_username"

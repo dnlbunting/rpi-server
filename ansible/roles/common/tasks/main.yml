@@ -1,0 +1,38 @@
+- name: Ping
+  ping:
+
+- name: Install htop
+  become: true
+  apt:
+    name: htop
+
+#- name: Install log2ram
+#  become: true
+#  apt:
+#    name: log2ram
+#
+
+- name: Install fuse + exfat
+  become: true
+  apt:
+    name:
+      - exfat-fuse
+      - exfat-utils
+
+#- name: Create a directory if it does not exist
+#  file:
+#    path: /mnt/disk1
+#    state: directory
+#    mode: '0755'
+
+# CGROUP in /boot/cmdline.txct
+# legacty iptables
+# Disable swap?
+
+- name: Mount disk1
+  become: true
+  ansible.posix.mount:
+    path: /mnt/disk1
+    src: UUID=501B-4516
+    fstype: exfat
+    state: mounted
