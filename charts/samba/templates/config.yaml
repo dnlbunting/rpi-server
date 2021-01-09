@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: samba-configmap
+data:
+  smb.conf: |-
+{{ .Files.Get "conf/smb.conf" | indent 4 }}

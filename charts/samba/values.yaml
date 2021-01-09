@@ -1,0 +1,21 @@
+# Default values for samba.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+image:
+  repository: dnlbunting/samba
+  tag: latest
+  pullPolicy: Always
+
+service:
+  name: samba
+  type: ClusterIP
+  externalNMBPort137: 137
+  internalNMBPort137: 137
+  externalNMBPort138: 138
+  internalNMBPort138: 138
+  externalSMBPort139: 139
+  internalSMBPort139: 139
+  externalSMBPort445: 445
+  internalSMBPort445: 445

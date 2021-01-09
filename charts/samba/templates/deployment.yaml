@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "samba.fullname" . }}
+  labels:
+    {{- include "samba.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "samba.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "samba.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: ini-configmap
+          configMap:
+            name: samba-configmap
+        - name: disk1
+          hostPath:
+            path: /mnt/disk1/
+            type: Directory
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - containerPort: 445
+            name: smb445
+          - containerPort: 139
+            name: smb139
+          - containerPort: 137
+            name: nmb137
+          - containerPort: 138
+            name: nmb138
+          readinessProbe:
+            tcpSocket:
+              port: 445
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 445
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: ini-configmap
+              mountPath: /etc/samba/smb.conf
+              subPath: smb.conf
+            - mountPath: /disk1
+              name: disk1
