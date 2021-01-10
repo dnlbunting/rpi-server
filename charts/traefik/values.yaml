@@ -1,4 +1,6 @@
 traefik:
+  additionalArguments:
+    - "--metrics.prometheus=true"
   ingressRoute:
     dashboard:
       enabled: false

@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "traefik.fullname" . }}-metrics
+  labels:
+    app.kubernetes.io/name: {{ template "traefik.name" . }}
+    helm.sh/chart: {{ template "traefik.chart" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: metrics
+spec:
+  ports:
+  - name: traefik
+    port: 9000
+    protocol: TCP
+    targetPort: traefik
+  selector:
+    app.kubernetes.io/name: {{ template "traefik.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  type: ClusterIP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "traefik.fullname" . }}
+  labels:
+    release: prometheus
+    app.kubernetes.io/name: {{ template "traefik.name" . }}
+    helm.sh/chart: {{ template "traefik.chart" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  jobLabel: jobLabel
+  endpoints:
+  - port: traefik
+    honorLabels: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "traefik.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: metrics
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace | quote }}

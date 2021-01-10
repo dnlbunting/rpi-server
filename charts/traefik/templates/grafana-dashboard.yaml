@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-dashboard
+  labels:
+     grafana_dashboard: "true"
+data:
+  traefik-dashboard.json: {{ $.Files.Get "files/traefik_dashboard.json" | toJson }}
