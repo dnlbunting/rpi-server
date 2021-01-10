@@ -1,0 +1,50 @@
+kube-prometheus-stack:
+
+  kubeEtcd:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+      enabled: false
+  alertmanager:
+    enabled: false
+  configmapReload:
+    alertmanager:
+      enabled: false
+
+  defaultRules:
+    create: false
+
+  kube-state-metrics:
+    image:
+      repository: k8s.gcr.io/kube-state-metrics-arm
+      tag: v1.9.5
+
+  grafana:
+    plugins:
+      - grafana-piechart-panel
+    grafana.ini:
+      server:
+        domain: rpi.local
+        root_url: http://rpi.local/grafana/
+        serve_from_sub_path: true
+
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: true
+      serviceMonitorSelector: {}
+      #serviceMonitorNamespaceSelector:
+      #  any: true
+
+      podMonitorSelectorNilUsesHelmValues: true
+      podMonitorSelector: {}
+      #podMonitorNamespaceSelector:
+      #  any: true
+
+      probeMonitorSelectorNilUsesHelmValues: true
+      probeMonitorSelector: {}
+      #probeMonitorNamespaceSelector:
+      #  any: true
+
+      #externalUrl:
+      #routePrefix:

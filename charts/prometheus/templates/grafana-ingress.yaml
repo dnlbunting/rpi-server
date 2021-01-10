@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana-dashboard
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/grafana`)
+      kind: Rule
+      services:
+        - name: prometheus-grafana
+          port: 80
+          namespace: monitoring

@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus-dashboard
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`prometheus.rpi.local`)
+      kind: Rule
+      services:
+        - name: prometheus-kube-prometheus-prometheus
+          port: 9090
+          namespace: monitoring
