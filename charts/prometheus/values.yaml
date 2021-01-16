@@ -13,7 +13,7 @@ kube-prometheus-stack:
       enabled: false
 
   defaultRules:
-    create: false
+    create: true
 
   kube-state-metrics:
     image:
@@ -25,8 +25,8 @@ kube-prometheus-stack:
       - grafana-piechart-panel
     grafana.ini:
       server:
-        domain: rpi.local
-        root_url: http://rpi.local/grafana/
+        domain: grafana.rpi.local
+        root_url: http://grafana.rpi.local/
         serve_from_sub_path: true
 
   prometheus:

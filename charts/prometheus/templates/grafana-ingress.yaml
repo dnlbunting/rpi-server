@@ -6,7 +6,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: PathPrefix(`/grafana`)
+    - match: Host(`grafana.rpi.local`)
       kind: Rule
       services:
         - name: prometheus-grafana

@@ -1,6 +1,7 @@
 traefik:
   additionalArguments:
     - "--metrics.prometheus=true"
+    - "--log.level=DEBUG"
   ingressRoute:
     dashboard:
       enabled: false
