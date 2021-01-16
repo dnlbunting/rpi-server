@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "plex.fullname" . }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "plex.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "plex.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: transcode
+          persistentVolumeClaim:
+            claimName: plex-transcode
+        - name: config
+          persistentVolumeClaim:
+            claimName: plex-library
+        - name: data
+          hostPath:
+            path: /mnt/disk1/plex
+            type: Directory
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 32400
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "Europe/London"
+            - name: PLEX_CLAIM
+              value: "claim-tRskRVk4_x-UR6hXzhKE"
+            - name: PMS_INTERNAL_ADDRESS
+              value: http://{{ include "plex.fullname" . }}:32400
+
+          readinessProbe:
+            httpGet:
+              path: /identity
+              port: 32400
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /identity
+              port: 32400
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: transcode
+              mountPath: /transcode.

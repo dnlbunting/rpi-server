@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "plex.fullname" . }}
+  labels:
+    {{- include "plex.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 32400
+      targetPort: 32400
+      name: plex-http
+      protocol: TCP
+  selector:
+    {{- include "plex.selectorLabels" . | nindent 4 }}

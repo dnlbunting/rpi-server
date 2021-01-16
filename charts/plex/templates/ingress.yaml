@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: plex
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`plex.rpi.local`)
+      kind: Rule
+      services:
+      - name: plex
+        port: 32400

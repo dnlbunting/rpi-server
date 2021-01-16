@@ -1,0 +1,5 @@
+replicaCount: 1
+image:
+  repository: linuxserver/plex
+  pullPolicy: IfNotPresent
+  tag: "1.21.1.3876-3c3adfcb4-ls15"
