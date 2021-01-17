@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "transmission.fullname" . }}
+  labels:
+    {{- include "transmission.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "transmission.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "transmission.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: configmap
+          configMap:
+            name: {{ include "transmission.fullname" . }}-configmap
+        - name: data
+          hostPath:
+            path: /mnt/disk1/plex
+            type: Directory
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "transmission.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: configmap
+              mountPath: /config/settings.json
+              subPath: settings.json
+            - name: data
+              mountPath: /downloads
+            - name: config
+              mountPath: /config
+          ports:
+            - name: http
+              containerPort: 9091
+              protocol: TCP
+            - name: peer-tcp
+              containerPort: 51413
+              protocol: TCP
+            - name: peer-udp
+              containerPort: 51413
+              protocol: UDP
+          livenessProbe:
+            tcpSocket:
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 2
